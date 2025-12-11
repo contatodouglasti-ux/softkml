@@ -3,24 +3,18 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Map, Key, AlertCircle, Download, Trash2, MapPin, Plus } from 'lucide-react';
+import { Download, Trash2, MapPin, Plus } from 'lucide-react';
 import { MarkerData, generateKML, downloadKML } from '@/utils/kmlGenerator';
+
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMXNjc2E0MDVhdDNkcHpsOGJyNTVoaiJ9.TvVyw20EZaPUGyDqM7UxMg';
 
 export function MapEditor() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [tokenInput, setTokenInput] = useState<string>('');
   const [isMapReady, setIsMapReady] = useState(false);
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [documentName, setDocumentName] = useState('Meu KML');
-
-  const handleSetToken = () => {
-    if (tokenInput.trim()) {
-      setMapboxToken(tokenInput.trim());
-    }
-  };
 
   const addMarker = (lngLat: mapboxgl.LngLat) => {
     const id = `marker-${Date.now()}`;
@@ -54,16 +48,16 @@ export function MapEditor() {
   };
 
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
+    if (!mapContainer.current) return;
 
     try {
-      mapboxgl.accessToken = mapboxToken;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
         zoom: 2,
-        center: [-47, -15], // Brazil center
+        center: [-47, -15],
       });
 
       map.current.addControl(
@@ -91,7 +85,7 @@ export function MapEditor() {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken]);
+  }, []);
 
   // Sync markers with map
   useEffect(() => {
@@ -116,50 +110,6 @@ export function MapEditor() {
       }
     });
   }, [markers, isMapReady]);
-
-  if (!mapboxToken) {
-    return (
-      <div className="w-full p-6 rounded-xl bg-muted/30 border space-y-4">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Plus className="w-5 h-5" />
-          <h3 className="font-medium text-foreground">Criar KML</h3>
-        </div>
-        
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-          <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            Para criar um arquivo KML, insira seu token público do Mapbox. 
-            Você pode obtê-lo em{' '}
-            <a 
-              href="https://mapbox.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-2"
-            >
-              mapbox.com
-            </a>
-          </p>
-        </div>
-
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="pk.eyJ1Ijo..."
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              className="pl-10"
-              onKeyDown={(e) => e.key === 'Enter' && handleSetToken()}
-            />
-          </div>
-          <Button onClick={handleSetToken} disabled={!tokenInput.trim()}>
-            Carregar Mapa
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full space-y-4">
