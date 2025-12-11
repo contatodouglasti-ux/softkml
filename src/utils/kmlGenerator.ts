@@ -4,6 +4,7 @@ export interface MarkerData {
   description: string;
   longitude: number;
   latitude: number;
+  altitude: number;
 }
 
 export function generateKML(markers: MarkerData[], documentName: string = 'Meu KML'): string {
@@ -11,8 +12,19 @@ export function generateKML(markers: MarkerData[], documentName: string = 'Meu K
     <Placemark>
       <name>${escapeXml(marker.name)}</name>
       <description>${escapeXml(marker.description)}</description>
+      <ExtendedData>
+        <Data name="Latitude">
+          <value>${marker.latitude.toFixed(6)}</value>
+        </Data>
+        <Data name="Longitude">
+          <value>${marker.longitude.toFixed(6)}</value>
+        </Data>
+        <Data name="Altitude">
+          <value>${marker.altitude.toFixed(3)}</value>
+        </Data>
+      </ExtendedData>
       <Point>
-        <coordinates>${marker.longitude},${marker.latitude},0</coordinates>
+        <coordinates>${marker.longitude},${marker.latitude},${marker.altitude}</coordinates>
       </Point>
     </Placemark>`).join('\n');
 

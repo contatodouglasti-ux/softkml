@@ -30,13 +30,14 @@ export function MapEditor() {
       description: '',
       longitude: lngLat.lng,
       latitude: lngLat.lat,
+      altitude: 0,
     };
     setMarkers(prev => [...prev, newMarker]);
   };
 
-  const updateMarker = (id: string, field: keyof MarkerData, value: string) => {
+  const updateMarker = (id: string, field: keyof MarkerData, value: string | number) => {
     setMarkers(prev => prev.map(m => 
-      m.id === id ? { ...m, [field]: value } : m
+      m.id === id ? { ...m, [field]: field === 'altitude' ? parseFloat(value as string) || 0 : value } : m
     ));
   };
 
@@ -230,6 +231,17 @@ export function MapEditor() {
                     placeholder="Descrição (opcional)"
                     className="h-8 text-sm"
                   />
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-muted-foreground shrink-0">Altitude:</label>
+                    <Input
+                      type="number"
+                      value={marker.altitude}
+                      onChange={(e) => updateMarker(marker.id, 'altitude', e.target.value)}
+                      placeholder="0"
+                      className="h-8 text-sm"
+                      step="0.001"
+                    />
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {marker.latitude.toFixed(6)}, {marker.longitude.toFixed(6)}
                   </p>
