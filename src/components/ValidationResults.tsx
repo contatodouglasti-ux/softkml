@@ -1,6 +1,7 @@
 import { CheckCircle2, XCircle, AlertTriangle, MapPin, FileText, Globe } from 'lucide-react';
 import { ValidationResult, PlacemarkData } from '@/utils/kmlValidator';
 import { cn } from '@/lib/utils';
+import { MapView } from './MapView';
 
 interface ValidationResultsProps {
   result: ValidationResult;
@@ -118,6 +119,11 @@ export function ValidationResults({ result }: ValidationResultsProps) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Map View */}
+          {result.data.placemarks.length > 0 && (
+            <MapView placemarks={result.data.placemarks} />
           )}
         </div>
       )}
