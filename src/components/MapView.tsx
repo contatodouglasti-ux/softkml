@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { CoordinateData, PlacemarkData } from '@/utils/kmlValidator';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Map, Key, AlertCircle } from 'lucide-react';
+import { Map } from 'lucide-react';
+
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMXNjc2E0MDVhdDNkcHpsOGJyNTVoaiJ9.TvVyw20EZaPUGyDqM7UxMg';
 
 interface MapViewProps {
   placemarks: PlacemarkData[];
@@ -13,8 +13,6 @@ interface MapViewProps {
 export function MapView({ placemarks }: MapViewProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [tokenInput, setTokenInput] = useState<string>('');
   const [isMapReady, setIsMapReady] = useState(false);
 
   // Get all coordinates from placemarks
@@ -33,17 +31,11 @@ export function MapView({ placemarks }: MapViewProps) {
     );
   };
 
-  const handleSetToken = () => {
-    if (tokenInput.trim()) {
-      setMapboxToken(tokenInput.trim());
-    }
-  };
-
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
+    if (!mapContainer.current) return;
 
     try {
-      mapboxgl.accessToken = mapboxToken;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
@@ -68,7 +60,7 @@ export function MapView({ placemarks }: MapViewProps) {
 
         // Add markers for each placemark
         placemarks.forEach((placemark, placemarkIndex) => {
-          placemark.coordinates.forEach((coord, coordIndex) => {
+          placemark.coordinates.forEach((coord) => {
             const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
               `<div style="font-family: system-ui; padding: 4px;">
                 <strong style="color: #1f2937;">${placemark.name}</strong>
@@ -80,7 +72,7 @@ export function MapView({ placemarks }: MapViewProps) {
               </div>`
             );
 
-            const marker = new mapboxgl.Marker({
+            new mapboxgl.Marker({
               color: `hsl(${(placemarkIndex * 40) % 360}, 70%, 50%)`,
             })
               .setLngLat([coord.longitude, coord.latitude])
@@ -102,52 +94,7 @@ export function MapView({ placemarks }: MapViewProps) {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken, placemarks]);
-
-  if (!mapboxToken) {
-    return (
-      <div className="w-full p-6 rounded-xl bg-muted/30 border space-y-4">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Map className="w-5 h-5" />
-          <h3 className="font-medium text-foreground">Visualização no Mapa</h3>
-        </div>
-        
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-          <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            Para visualizar as coordenadas no mapa, insira seu token público do Mapbox. 
-            Você pode obtê-lo em{' '}
-            <a 
-              href="https://mapbox.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary underline underline-offset-2"
-            >
-              mapbox.com
-            </a>
-            {' '}na seção Tokens do dashboard.
-          </p>
-        </div>
-
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="pk.eyJ1Ijo..."
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              className="pl-10"
-              onKeyDown={(e) => e.key === 'Enter' && handleSetToken()}
-            />
-          </div>
-          <Button onClick={handleSetToken} disabled={!tokenInput.trim()}>
-            Carregar Mapa
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  }, [placemarks]);
 
   return (
     <div className="w-full space-y-4">
