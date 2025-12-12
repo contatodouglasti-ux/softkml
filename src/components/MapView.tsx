@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { CoordinateData, PlacemarkData } from '@/utils/kmlValidator';
 import { Map } from 'lucide-react';
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMXNjc2E0MDVhdDNkcHpsOGJyNTVoaiJ9.TvVyw20EZaPUGyDqM7UxMg';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMjRvNjcyMGNwajNlb2p0M2RoYmVwaCJ9.751h9O2EDapDGxrHVpMMng';
 
 interface MapViewProps {
   placemarks: PlacemarkData[];
