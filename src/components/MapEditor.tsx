@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Download, Trash2, MapPin, Plus } from 'lucide-react';
+import { Download, Trash2, MapPin, Plus, Search } from 'lucide-react';
 import { MarkerData, generateKML, downloadKML } from '@/utils/kmlGenerator';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMjRvNjcyMGNwajNlb2p0M2RoYmVwaCJ9.751h9O2EDapDGxrHVpMMng';
@@ -15,6 +15,38 @@ export function MapEditor() {
   const [isMapReady, setIsMapReady] = useState(false);
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [documentName, setDocumentName] = useState('Meu KML');
+  const [rua, setRua] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
+  const searchAddress = async () => {
+    const addressParts = [rua, bairro, cidade].filter(Boolean);
+    if (addressParts.length === 0) return;
+    
+    const address = addressParts.join(', ');
+    setIsSearching(true);
+    
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${MAPBOX_TOKEN}&country=BR&limit=1`
+      );
+      const data = await response.json();
+      
+      if (data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].center;
+        map.current?.flyTo({
+          center: [lng, lat],
+          zoom: 16,
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar endereço:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const addMarker = (lngLat: mapboxgl.LngLat) => {
     const id = `marker-${Date.now()}`;
@@ -139,6 +171,41 @@ export function MapEditor() {
 
         {/* Sidebar with markers */}
         <div className="w-80 space-y-4">
+          {/* Address Search */}
+          <div className="p-3 rounded-lg bg-muted/30 border space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <Search className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">Buscar Endereço</span>
+            </div>
+            <Input
+              value={rua}
+              onChange={(e) => setRua(e.target.value)}
+              placeholder="Rua"
+              className="h-8 text-sm"
+            />
+            <Input
+              value={bairro}
+              onChange={(e) => setBairro(e.target.value)}
+              placeholder="Bairro"
+              className="h-8 text-sm"
+            />
+            <Input
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+              placeholder="Cidade"
+              className="h-8 text-sm"
+              onKeyDown={(e) => e.key === 'Enter' && searchAddress()}
+            />
+            <Button 
+              onClick={searchAddress} 
+              disabled={isSearching || (!rua && !bairro && !cidade)}
+              size="sm"
+              className="w-full"
+            >
+              {isSearching ? 'Buscando...' : 'Ir para endereço'}
+            </Button>
+          </div>
+
           <div>
             <label className="text-sm font-medium text-foreground">Nome do Documento</label>
             <Input
