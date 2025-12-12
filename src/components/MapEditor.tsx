@@ -155,22 +155,9 @@ export function MapEditor() {
         </div>
       </div>
 
-      <div className="flex gap-4">
-        {/* Map */}
-        <div className="relative flex-1 h-[500px] rounded-xl overflow-hidden border shadow-lg">
-          <div ref={mapContainer} className="absolute inset-0" />
-          {!isMapReady && (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
-              <div className="flex items-center gap-3">
-                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-muted-foreground">Carregando mapa...</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar with markers */}
-        <div className="w-80 space-y-4">
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* Sidebar with markers - comes first on mobile */}
+        <div className="w-full lg:w-80 space-y-4 order-1 lg:order-2">
           {/* Address Search */}
           <div className="p-3 rounded-lg bg-muted/30 border space-y-2">
             <div className="flex items-center gap-2 mb-2">
@@ -275,6 +262,19 @@ export function MapEditor() {
             <Download className="w-4 h-4 mr-2" />
             Exportar KML ({markers.length} pontos)
           </Button>
+        </div>
+
+        {/* Map - comes second on mobile (below sidebar) */}
+        <div className="relative flex-1 h-[400px] lg:h-[500px] rounded-xl overflow-hidden border shadow-lg order-2 lg:order-1">
+          <div ref={mapContainer} className="absolute inset-0" />
+          {!isMapReady && (
+            <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <span className="text-muted-foreground">Carregando mapa...</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
