@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Trash2, MapPin, Plus } from 'lucide-react';
 import { MarkerData, generateKML, downloadKML } from '@/utils/kmlGenerator';
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMXNjc2E0MDVhdDNkcHpsOGJyNTVoaiJ9.TvVyw20EZaPUGyDqM7UxMg';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMjRvNjcyMGNwajNlb2p0M2RoYmVwaCJ9.751h9O2EDapDGxrHVpMMng';
 
 export function MapEditor() {
   const mapContainer = useRef<HTMLDivElement>(null);
