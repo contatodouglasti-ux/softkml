@@ -12,6 +12,16 @@ export function generateKML(markers: MarkerData[], documentName: string = 'Meu K
     <Placemark>
       <name>${escapeXml(marker.name)}</name>
       <description>${escapeXml(marker.description)}</description>
+      <LookAt>
+        <longitude>${marker.longitude}</longitude>
+        <latitude>${marker.latitude}</latitude>
+        <altitude>${marker.altitude}</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <gx:fovy>35</gx:fovy>
+        <range>764.8683811249794</range>
+        <altitudeMode>absolute</altitudeMode>
+      </LookAt>
       <ExtendedData>
         <Data name="Latitude">
           <value>${marker.latitude.toFixed(6)}</value>
@@ -29,7 +39,7 @@ export function generateKML(markers: MarkerData[], documentName: string = 'Meu K
     </Placemark>`).join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
   <Document>
     <name>${escapeXml(documentName)}</name>
     ${placemarks}
