@@ -265,7 +265,7 @@ export function MapEditor() {
         </div>
 
         {/* Map - comes second on mobile (below sidebar) */}
-        <div className="relative flex-1 h-[400px] lg:h-[500px] rounded-xl overflow-hidden border shadow-lg order-2 lg:order-1">
+        <div className="relative w-full lg:flex-1 h-[400px] lg:h-[500px] rounded-xl overflow-hidden border shadow-lg order-2 lg:order-1 min-h-[400px]">
           <div ref={mapContainer} className="absolute inset-0" />
           {!isMapReady && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
