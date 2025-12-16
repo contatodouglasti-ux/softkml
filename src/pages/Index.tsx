@@ -49,7 +49,7 @@ const Index = () => {
               <MapPin className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">KML Tools</h1>
+              <h1 className="text-xl font-bold text-foreground">Soft KML</h1>
               <p className="text-sm text-muted-foreground">Validar e criar arquivos KML</p>
             </div>
           </div>
