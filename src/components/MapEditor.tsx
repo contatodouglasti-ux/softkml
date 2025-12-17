@@ -3,8 +3,9 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Download, Trash2, MapPin, Plus, Search } from 'lucide-react';
+import { Download, Trash2, MapPin, Plus, Search, Navigation } from 'lucide-react';
 import { MarkerData, generateKML, downloadKML } from '@/utils/kmlGenerator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiZG91Z2dpaXUiLCJhIjoiY21qMjRvNjcyMGNwajNlb2p0M2RoYmVwaCJ9.751h9O2EDapDGxrHVpMMng';
 
@@ -19,6 +20,8 @@ export function MapEditor() {
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [searchLat, setSearchLat] = useState('');
+  const [searchLng, setSearchLng] = useState('');
 
   const searchAddress = async () => {
     const addressParts = [rua, bairro, cidade].filter(Boolean);
@@ -46,6 +49,20 @@ export function MapEditor() {
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const goToCoordinates = () => {
+    const lat = parseFloat(searchLat);
+    const lng = parseFloat(searchLng);
+    
+    if (isNaN(lat) || isNaN(lng)) return;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+    
+    map.current?.flyTo({
+      center: [lng, lat],
+      zoom: 16,
+      duration: 2000,
+    });
   };
 
   const addMarker = (lngLat: mapboxgl.LngLat) => {
@@ -158,39 +175,78 @@ export function MapEditor() {
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Sidebar with markers - comes first on mobile */}
         <div className="w-full lg:w-80 space-y-4 order-1 lg:order-2">
-          {/* Address Search */}
+          {/* Location Search with Tabs */}
           <div className="p-3 rounded-lg bg-muted/30 border space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <Search className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">Buscar Endereço</span>
-            </div>
-            <Input
-              value={rua}
-              onChange={(e) => setRua(e.target.value)}
-              placeholder="Rua"
-              className="h-8 text-sm"
-            />
-            <Input
-              value={bairro}
-              onChange={(e) => setBairro(e.target.value)}
-              placeholder="Bairro"
-              className="h-8 text-sm"
-            />
-            <Input
-              value={cidade}
-              onChange={(e) => setCidade(e.target.value)}
-              placeholder="Cidade"
-              className="h-8 text-sm"
-              onKeyDown={(e) => e.key === 'Enter' && searchAddress()}
-            />
-            <Button 
-              onClick={searchAddress} 
-              disabled={isSearching || (!rua && !bairro && !cidade)}
-              size="sm"
-              className="w-full"
-            >
-              {isSearching ? 'Buscando...' : 'Ir para endereço'}
-            </Button>
+            <Tabs defaultValue="address" className="w-full">
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="address" className="text-xs">
+                  <Search className="w-3 h-3 mr-1" />
+                  Endereço
+                </TabsTrigger>
+                <TabsTrigger value="coordinates" className="text-xs">
+                  <Navigation className="w-3 h-3 mr-1" />
+                  Coordenadas
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="address" className="space-y-2 mt-2">
+                <Input
+                  value={rua}
+                  onChange={(e) => setRua(e.target.value)}
+                  placeholder="Rua"
+                  className="h-8 text-sm"
+                />
+                <Input
+                  value={bairro}
+                  onChange={(e) => setBairro(e.target.value)}
+                  placeholder="Bairro"
+                  className="h-8 text-sm"
+                />
+                <Input
+                  value={cidade}
+                  onChange={(e) => setCidade(e.target.value)}
+                  placeholder="Cidade"
+                  className="h-8 text-sm"
+                  onKeyDown={(e) => e.key === 'Enter' && searchAddress()}
+                />
+                <Button 
+                  onClick={searchAddress} 
+                  disabled={isSearching || (!rua && !bairro && !cidade)}
+                  size="sm"
+                  className="w-full"
+                >
+                  {isSearching ? 'Buscando...' : 'Ir para endereço'}
+                </Button>
+              </TabsContent>
+              
+              <TabsContent value="coordinates" className="space-y-2 mt-2">
+                <Input
+                  value={searchLat}
+                  onChange={(e) => setSearchLat(e.target.value)}
+                  placeholder="Latitude (ex: -23.5505)"
+                  className="h-8 text-sm"
+                  type="number"
+                  step="any"
+                />
+                <Input
+                  value={searchLng}
+                  onChange={(e) => setSearchLng(e.target.value)}
+                  placeholder="Longitude (ex: -46.6333)"
+                  className="h-8 text-sm"
+                  type="number"
+                  step="any"
+                  onKeyDown={(e) => e.key === 'Enter' && goToCoordinates()}
+                />
+                <Button 
+                  onClick={goToCoordinates} 
+                  disabled={!searchLat || !searchLng}
+                  size="sm"
+                  className="w-full"
+                >
+                  Ir para coordenadas
+                </Button>
+              </TabsContent>
+            </Tabs>
           </div>
 
           <div>
