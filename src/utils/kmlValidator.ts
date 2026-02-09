@@ -159,9 +159,10 @@ export function parseAndValidateKML(content: string): ValidationResult {
       });
       
       if (missingFields.length > 0) {
-        warnings.push({
+        errors.push({
           type: 'structure',
-          message: `LookAt em "${placemarkName}" está incompleto. Campos faltando: ${missingFields.join(', ')}`
+          message: `LookAt em "${placemarkName}" está incompleto. Campos faltando: ${missingFields.join(', ')}`,
+          details: 'O elemento <LookAt> deve conter os sub-elementos: longitude, latitude, altitude, heading, tilt, gx:fovy, range e altitudeMode.'
         });
       }
     }
