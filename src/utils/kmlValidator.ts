@@ -130,9 +130,33 @@ export function parseAndValidateKML(content: string): ValidationResult {
     const nameElement = placemark.querySelector('name');
     const descriptionElement = placemark.querySelector('description');
     const coordinatesElements = placemark.querySelectorAll('coordinates');
+    const lookAtElement = placemark.querySelector('LookAt');
     
     const placemarkName = nameElement?.textContent?.trim() || `Placemark ${index + 1}`;
     const coordinates: CoordinateData[] = [];
+
+    // Validate that LookAt element exists
+    if (!lookAtElement) {
+      errors.push({
+        type: 'structure',
+        message: `Placemark "${placemarkName}" não possui elemento <LookAt>`,
+        details: 'Cada Placemark deve conter um elemento <LookAt> com longitude, latitude, altitude, heading, tilt, gx:fovy, range e altitudeMode.'
+      });
+    } else {
+      // Validate required LookAt sub-elements
+      const requiredLookAtFields = ['longitude', 'latitude', 'altitude', 'heading', 'tilt', 'range', 'altitudeMode'];
+      const missingFields = requiredLookAtFields.filter(field => {
+        const el = lookAtElement.querySelector(field);
+        return !el || !el.textContent?.trim();
+      });
+      
+      if (missingFields.length > 0) {
+        warnings.push({
+          type: 'structure',
+          message: `LookAt em "${placemarkName}" está incompleto. Campos faltando: ${missingFields.join(', ')}`
+        });
+      }
+    }
 
     coordinatesElements.forEach((coordElement) => {
       const coordText = coordElement.textContent?.trim();
@@ -145,7 +169,6 @@ export function parseAndValidateKML(content: string): ValidationResult {
           if (parts.length >= 2) {
             const [longitude, latitude, altitude] = parts;
             
-            // Validate coordinate ranges
             if (isNaN(longitude) || isNaN(latitude)) {
               warnings.push({
                 type: 'coordinates',
