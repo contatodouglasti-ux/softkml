@@ -145,6 +145,14 @@ export function parseAndValidateKML(content: string): ValidationResult {
     } else {
       // Validate required LookAt sub-elements
       const requiredLookAtFields = ['longitude', 'latitude', 'altitude', 'heading', 'tilt', 'range', 'altitudeMode'];
+      // Also check for gx:fovy using getElementsByTagName since querySelector doesn't handle namespace prefixes well
+      const gxFovy = lookAtElement.getElementsByTagName('gx:fovy');
+      if (!gxFovy.length || !gxFovy[0].textContent?.trim()) {
+        warnings.push({
+          type: 'structure',
+          message: `LookAt em "${placemarkName}" está sem o campo gx:fovy`
+        });
+      }
       const missingFields = requiredLookAtFields.filter(field => {
         const el = lookAtElement.querySelector(field);
         return !el || !el.textContent?.trim();
@@ -197,9 +205,10 @@ export function parseAndValidateKML(content: string): ValidationResult {
     });
 
     if (coordinates.length === 0) {
-      warnings.push({
+      errors.push({
         type: 'coordinates',
-        message: `Placemark "${placemarkName}" não possui coordenadas válidas.`
+        message: `Placemark "${placemarkName}" não possui elemento <coordinates> válido`,
+        details: 'Cada Placemark deve conter um elemento <coordinates> com longitude, latitude e altitude.'
       });
     }
 
