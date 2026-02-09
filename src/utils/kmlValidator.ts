@@ -205,9 +205,10 @@ export function parseAndValidateKML(content: string): ValidationResult {
     });
 
     if (coordinates.length === 0) {
-      warnings.push({
+      errors.push({
         type: 'coordinates',
-        message: `Placemark "${placemarkName}" não possui coordenadas válidas.`
+        message: `Placemark "${placemarkName}" não possui elemento <coordinates> válido`,
+        details: 'Cada Placemark deve conter um elemento <coordinates> com longitude, latitude e altitude.'
       });
     }
 
