@@ -148,9 +148,10 @@ export function parseAndValidateKML(content: string): ValidationResult {
       // Also check for gx:fovy using getElementsByTagName since querySelector doesn't handle namespace prefixes well
       const gxFovy = lookAtElement.getElementsByTagName('gx:fovy');
       if (!gxFovy.length || !gxFovy[0].textContent?.trim()) {
-        warnings.push({
+        errors.push({
           type: 'structure',
-          message: `LookAt em "${placemarkName}" está sem o campo gx:fovy`
+          message: `LookAt em "${placemarkName}" está sem o campo gx:fovy`,
+          details: 'O elemento <LookAt> deve conter o sub-elemento gx:fovy.'
         });
       }
       const missingFields = requiredLookAtFields.filter(field => {
