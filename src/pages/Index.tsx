@@ -144,7 +144,7 @@ const Index = () => {
         <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <img src={softplanLogo} alt="Softplan" className="h-5" />
-            <span className="text-sm text-muted-foreground">Planejamento e Sistemas</span>
+            <span className="text-sm font-bold text-foreground">Planejamento e Sistemas</span>
           </div>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span>© 2026 Softplan. Todos os direitos reservados.</span>
